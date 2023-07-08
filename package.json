@@ -1,0 +1,10 @@
+{
+  "name": "android-list-fetcher",
+  "version": "1.0.0",
+  "main": "index.js",
+  "author": "FallenAngel97 <support_android@meta.ua>",
+  "license": "MIT",
+  "dependencies": {
+    "fast-xml-parser": "^4.2.5"
+  }
+}
