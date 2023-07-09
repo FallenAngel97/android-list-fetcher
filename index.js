@@ -1,5 +1,7 @@
 const https = require('https');
 const { XMLParser } = require('fast-xml-parser');
+const fs = require('fs');
+const { execSync } = require('child_process');
 
 function getRawAndroidListXml() {
 	return new Promise((resolve, reject) => {
@@ -26,7 +28,16 @@ function main() {
 				.remotePackage
 				.filter(pack => /Android SDK Platform [0-9]+$/.test(pack['display-name']))
 				.map((pack) => pack['type-details']['api-level']);
+			return packages;
+		}).then((packages) => {
 			console.log(packages);
+			fs.promises.readdir('scripts').then((files => {
+				if(files.length == 0) return;
+
+				files.filter(f => f != '.gitkeep').forEach((file) => {
+					execSync(`scripts/${file} ${JSON.stringify(packages)}`).toString();
+				});
+			}))
 		})
 		.catch(err => console.error(err));
 }

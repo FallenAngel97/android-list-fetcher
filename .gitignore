@@ -1,2 +1,4 @@
 node_modules
 *.log
+scripts/*
+!scripts/.gitkeep
