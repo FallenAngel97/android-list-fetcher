@@ -28,7 +28,7 @@ function main() {
 				.remotePackage
 				.filter(pack => /Android SDK Platform [0-9]+$/.test(pack['display-name']))
 				.map((pack) => pack['type-details']['api-level']);
-			return packages;
+			return [...new Set(packages)];
 		}).then((packages) => {
 			console.log(packages);
 			fs.promises.readdir('scripts').then((files => {
