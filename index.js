@@ -1,7 +1,7 @@
 const https = require('https');
 const { XMLParser } = require('fast-xml-parser');
 const fs = require('fs');
-const { execSync } = require('child_process');
+const { execSync, exec } = require('child_process');
 
 function getRawAndroidListXml() {
 	return new Promise((resolve, reject) => {
@@ -19,6 +19,32 @@ function getRawAndroidListXml() {
 	});
 }
 
+const { REPOSITORIES } = process.env;
+
+function cloneRepos(reposList, packages) {
+	if (!reposList || !Array.isArray(reposList) || reposList.length == 0) return Promise.resolve();
+
+	return new Promise((resolve, reject) => {
+		try {
+			reposList.map((repo, index) => {
+				execSync(`git clone ${repo} repo${index}`).toString();
+				const files = fs.readdirSync(`repo${index}/scripts`, { withFileTypes: true })
+				if(files.length == 0) return;
+
+				files.filter(f => f.isFile() && f.name != '.gitkeep').forEach((file) => {
+					console.log(execSync(`./repo${index}/scripts/${file.name} "${JSON.stringify(packages)}"`).toString());
+				});
+			});
+			resolve();
+		} catch (ex) {
+			reject(ex);
+		}
+		finally {
+			execSync('rm -rf repo*');
+		}
+	});
+}
+
 function main() {
 	getRawAndroidListXml()
 		.then(res => {
@@ -31,13 +57,8 @@ function main() {
 			return [...new Set(packages)];
 		}).then((packages) => {
 			console.log(packages);
-			fs.promises.readdir('scripts').then((files => {
-				if(files.length == 0) return;
 
-				files.filter(f => f != '.gitkeep').forEach((file) => {
-					execSync(`scripts/${file} ${JSON.stringify(packages)}`).toString();
-				});
-			}))
+			cloneRepos(REPOSITORIES?.split(' '), packages);
 		})
 		.catch(err => console.error(err));
 }
