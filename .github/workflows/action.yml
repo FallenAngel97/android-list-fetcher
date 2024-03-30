@@ -4,10 +4,10 @@ jobs:
   publish-hello-docker-image:
     runs-on: ubuntu-latest
     steps:
-    - uses: actions/checkout@v2
+    - uses: actions/checkout@v4
     - name: Generate Docker metadata
       id: meta
-      uses: docker/metadata-action@v3
+      uses: docker/metadata-action@v5
       with:
         images: |
           ghcr.io/${{ github.repository }}
@@ -26,7 +26,7 @@ jobs:
         username: ${{ github.actor }}
         password: ${{ secrets.GITHUB_TOKEN }}
     - name: Build and push
-      uses: docker/build-push-action@v2
+      uses: docker/build-push-action@v5
       env:
         DOCKER_BUILDKIT: 1
       with:
@@ -34,3 +34,6 @@ jobs:
         context: .
         tags: ${{ steps.meta.outputs.tags }}
         labels: ${{ steps.meta.outputs.labels }}
+permissions:
+  contents: read
+  packages: write
