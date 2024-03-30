@@ -10,7 +10,7 @@ jobs:
       uses: docker/metadata-action@v5
       with:
         images: |
-          ghcr.io/${{ github.repository }}
+          ghcr.io/f97a/android-fetcher
         tags: |
           type=ref,event=branch
           type=semver,pattern={{version}}
